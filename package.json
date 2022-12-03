@@ -1,6 +1,6 @@
 {
-  "name": "redirect",
-  "version": "0.0.0",
+  "name": "vote.health",
+  "version": "1.0.0",
   "devDependencies": {
     "wrangler": "2.5.0"
   },
