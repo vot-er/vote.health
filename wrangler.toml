@@ -6,3 +6,7 @@ env = { }
 
 [triggers]
 crons = [ ]
+
+# The necessary secrets are:
+# SUPABASE_ENDPOINT
+# SUPABASE_PUBLIC_ANON_KEY
