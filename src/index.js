@@ -1,15 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 
 export default {
-	async fetch(request, env, ctx) {
-		const requestUrl = new URL(request.url);
-		const code = requestUrl.pathname.replace('/', '');
-		const searchParams = requestUrl.searchParams;
+  async fetch(request, env, ctx) {
+    const requestUrl = new URL(request.url);
+    const code = requestUrl.pathname.replace('/', '');
+    const searchParams = requestUrl.searchParams;
 
-		const destinationUrl = await getUrl(code, searchParams, env);
+    const destinationUrl = await getUrl(code, searchParams, env);
 
-		return Response.redirect(destinationUrl, 301);
-	},
+    return Response.redirect(destinationUrl, 301);
+  },
 };
 
 async function getUrl(code, searchParams, env) {
