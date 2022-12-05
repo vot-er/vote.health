@@ -14,7 +14,7 @@ export default {
     try {
       const { code, searchParams } = getCodeAndParams(request);
       const { organizationId, customUrl } = await getOrgData(code, env);
-      destinationUrl = getUrl(code, organizationId, customUrl, searchParams);
+      destinationUrl = getUrl(destinationUrl, code, organizationId, customUrl, searchParams);
       return Response.redirect(destinationUrl, 301);
     } catch(error) {
       sentry.captureException(error);
@@ -50,7 +50,7 @@ async function getOrgData(code, env) {
   }
 }
 
-function getUrl(code, organizationId, customUrl, searchParams) {
+function getUrl(destinationUrl, code, organizationId, customUrl, searchParams) {
   if (organizationId) {
     searchParams.set('organizationId', organizationId);
     searchParams.set('ref', code);
