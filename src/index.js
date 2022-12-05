@@ -2,48 +2,52 @@ import { createClient } from '@supabase/supabase-js'
 
 export default {
   async fetch(request, env, ctx) {
-    const requestUrl = new URL(request.url);
-    const code = requestUrl.pathname.replace('/', '');
-    const searchParams = requestUrl.searchParams;
-
-    const destinationUrl = await getUrl(code, searchParams, env);
-
-    return Response.redirect(destinationUrl, 301);
+    let destinationUrl = 'https://act.vot-er.org/act/';
+    try {
+      const { code, searchParams } = getCodeAndParams(request);
+      const { organizationId, customUrl } = await getOrgData(code, env);
+      destinationUrl = getUrl(code, organizationId, customUrl, searchParams);
+      return Response.redirect(destinationUrl, 301);
+    } catch(error) {
+      return Response.redirect(destinationUrl, 301);
+    }
   },
 };
 
-async function getUrl(code, searchParams, env) {
-  let destinationUrl = 'https://act.vot-er.org/';
-
-  if (code) {
-    try {
-      const { organizationId, customUrl } = await getParams(code, env);
-
-      searchParams.set('organizationId', organizationId);
-      searchParams.set('ref', code);
-      if (customUrl) { destinationUrl = customUrl; }
-
-      destinationUrl = destinationUrl  + '?' + searchParams.toString();
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  return destinationUrl;
+function getCodeAndParams(request) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.pathname.replace('/', '');
+  const searchParams = requestUrl.searchParams;
+  return { code, searchParams };
 }
 
-async function getParams(code, env) {
-  const client = createClient(env.SUPABASE_ENDPOINT, env.SUPABASE_PUBLIC_ANON_KEY);
-  const { data, error } = await client
-    .from('kits')
-    .select(`
-      user (
-        organization (
-          id, customUrl
+async function getOrgData(code, env) {
+  if (code) {
+    const client = createClient(env.SUPABASE_ENDPOINT, env.SUPABASE_PUBLIC_ANON_KEY);
+    const { data, error } = await client
+      .from('kits')
+      .select(`
+        user (
+          organization (
+            id, customUrl
+          )
         )
-      )
-    `)
-    .eq('code', code);
-  const organization = data?.pop()?.user?.organization;
-  return { organizationId: organization?.id, customUrl: organization?.customUrl };
+      `)
+      .eq('code', code);
+    const organization = data?.pop()?.user?.organization;
+    return { organizationId: organization?.id, customUrl: organization?.customUrl };
+  } else {
+    return {};
+  }
+}
+
+function getUrl(code, organizationId, customUrl, searchParams) {
+  if (organizationId) {
+    searchParams.set('organizationId', organizationId);
+    searchParams.set('ref', code);
+    if (customUrl) { destinationUrl = customUrl; }
+  }
+
+  destinationUrl = destinationUrl  + '?' + searchParams.toString();
+  return destinationUrl;
 }
