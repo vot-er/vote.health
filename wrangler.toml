@@ -7,6 +7,9 @@ env = { }
 [triggers]
 crons = [ ]
 
+[vars]
+SENTRY_DSN = "https://46aece79a2a74d1399a1527e12a6a6dd@o1307325.ingest.sentry.io/4504278372515840"
+SUPABASE_ENDPOINT = "https://uxcjzomklsrmofrcvnwh.supabase.co"
+
 # The necessary secrets are:
-# SUPABASE_ENDPOINT
 # SUPABASE_PUBLIC_ANON_KEY

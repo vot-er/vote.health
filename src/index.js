@@ -1,7 +1,15 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js';
+import Toucan from 'toucan-js';
 
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request, env, context) {
+    const sentry = new Toucan({
+      dsn: env.SENTRY_DSN,
+      context,
+      request,
+      allowedHeaders: ['user-agent'],
+      allowedSearchParams: /(.*)/,
+    });
     let destinationUrl = 'https://act.vot-er.org/act/';
     try {
       const { code, searchParams } = getCodeAndParams(request);
@@ -9,6 +17,7 @@ export default {
       destinationUrl = getUrl(code, organizationId, customUrl, searchParams);
       return Response.redirect(destinationUrl, 301);
     } catch(error) {
+      sentry.captureException(error);
       return Response.redirect(destinationUrl, 301);
     }
   },
