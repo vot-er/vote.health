@@ -25,7 +25,7 @@ export default {
 
 function getCodeAndParams(request) {
   const requestUrl = new URL(request.url);
-  const code = requestUrl.pathname.replace('/', '');
+  const code = requestUrl.pathname.replace('/', '').toLowerCase();
   const searchParams = requestUrl.searchParams;
   return { code, searchParams };
 }
