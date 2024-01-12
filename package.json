@@ -2,7 +2,7 @@
   "name": "vote.health",
   "version": "1.0.0",
   "devDependencies": {
-    "wrangler": "2.5.0"
+    "wrangler": "^3.22.4"
   },
   "private": true,
   "scripts": {
