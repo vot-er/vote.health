@@ -13,8 +13,8 @@ export default {
     let destinationUrl = 'https://act.vot-er.org/act/';
     try {
       const { code, searchParams } = getCodeAndParams(request);
-      const { organizationId, customUrl } = await getOrgData(code, env);
-      destinationUrl = getUrl(destinationUrl, code, organizationId, customUrl, searchParams);
+      const { userId, organizationId, customUrl } = await getOrgData(code, env);
+      destinationUrl = getUrl(destinationUrl, code, userId, organizationId, customUrl, searchParams);
       return Response.redirect(destinationUrl, 301);
     } catch(error) {
       sentry.captureException(error);
@@ -37,25 +37,28 @@ async function getOrgData(code, env) {
       .from('kits')
       .select(`
         user (
+          id,
           organization (
             id, customUrl
           )
         )
       `)
       .eq('code', code);
-    const organization = data?.pop()?.user?.organization;
-    return { organizationId: organization?.id, customUrl: organization?.customUrl };
+    const userId = data?.[0]?.user?.id;
+    const organization = data?.[0]?.user?.organization;
+    return { userId: userId, organizationId: organization?.id, customUrl: organization?.customUrl };
   } else {
     return {};
   }
 }
 
-function getUrl(destinationUrl, code, organizationId, customUrl, searchParams) {
+function getUrl(destinationUrl, code, userId, organizationId, customUrl, searchParams) {
   if (organizationId) {
     searchParams.set('organizationId', organizationId);
-    searchParams.set('ref', code);
+    searchParams.set('userId', userId);
     if (customUrl) { destinationUrl = customUrl; }
   }
+  searchParams.set('ref', code);
 
   destinationUrl = destinationUrl  + '?' + searchParams.toString();
   return destinationUrl;
